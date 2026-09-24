@@ -1,3 +1,4 @@
+const API_URL = "https://puntotecno.onrender.com"; // Reemplazá por tu URL de Render
 let carrito = JSON.parse(localStorage.getItem('carritoActual')) || [];
 const usuarioId = localStorage.getItem('usuarioId');
 
@@ -106,12 +107,11 @@ window.eliminarProducto = (id) => {
         toast: true,
         position: 'bottom-end'
     });
- 
+
     guardarYRefrescar();
 };
 
 function vaciarCarritoCompleto() {
-
     Swal.fire({
         title: "¿Vaciar carrito?",
         text: "Se eliminarán todos los productos agregados.",
@@ -122,7 +122,6 @@ function vaciarCarritoCompleto() {
         confirmButtonColor: "#dc3545",
         reverseButtons: true
     }).then((result) => {
-
         if (result.isConfirmed) {
             localStorage.removeItem("carritoActual");
             carrito = [];
@@ -171,8 +170,6 @@ async function finalizarCompra() {
         try {
             const datosVenta = {
                 usuario_id: localStorage.getItem('usuarioId'),
-                //cliente: localStorage.getItem('cliente') || "Consumidor Final",
-                //usuario: localStorage.getItem('cliente') || "Consumidor Final",
                 total: total,
                 productos: carrito.map(p => ({
                     id: p.id,
@@ -181,7 +178,7 @@ async function finalizarCompra() {
                 }))
             };
 
-            const respuesta = await fetch('http://localhost:3000/api/ventas', {
+            const respuesta = await fetch(`${API_URL}/api/ventas`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

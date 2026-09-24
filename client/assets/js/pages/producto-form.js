@@ -1,3 +1,5 @@
+const API_URL = "https://puntotecno.onrender.com"; // URL pública de tu backend en Render
+
 if (localStorage.getItem("adminLogueado") !== "true") {
     window.location.href = "./login.html";
 }
@@ -8,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const productoId = urlParams.get("id"); 
 
     if (productoId && productoId !== "null" && productoId !== "undefined") {
-        fetch(`http://localhost:3000/api/productos/${productoId}`)
+        fetch(`${API_URL}/api/productos/${productoId}`)
             .then(res => {
                 if (!res.ok) {
                     throw new Error(`El producto con ID ${productoId} no existe.`);
@@ -19,7 +21,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.getElementById("nombre").value = producto.nombre || "";
                 document.getElementById("precio").value = producto.precio || "";
                 document.getElementById("stock").value = producto.stock || "";
-                //document.getElementById("imagen").value = producto.imagen || "";
                 document.getElementById("categoria").value = producto.categoria || "";
                 document.getElementById("activo").checked = producto.activo == 1 || producto.activo == true;
             })
@@ -38,16 +39,6 @@ document.addEventListener("DOMContentLoaded", () => {
     form.addEventListener("submit", async (e) => {
         e.preventDefault();
 
-        /*const productoData = {
-            nombre: document.getElementById("nombre").value.trim(),
-            precio: parseFloat(document.getElementById("precio").value),
-            stock: parseInt(document.getElementById("stock").value),
-            imagen: document.getElementById("imagen").value.trim() || "favicon.png",
-            categoria: document.getElementById("categoria").value,
-            activo: document.getElementById("activo").checked ? 1 : 0
-        };*/
-
-
         const formData = new FormData();
 
         formData.append("nombre", document.getElementById("nombre").value.trim());
@@ -63,21 +54,18 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         try {
-            let url = "http://localhost:3000/api/productos";
+            let url = `${API_URL}/api/productos`;
             let metodo = "POST"; 
 
             if (productoId && productoId !== "null" && productoId !== "undefined") {
-                url = `http://localhost:3000/api/productos/${productoId}`;
+                url = `${API_URL}/api/productos/${productoId}`;
                 metodo = "PUT"; 
             }
 
             const respuesta = await fetch(url, {
                 method: metodo,
-                //headers: { "Content-Type": "application/json" },
                 body: formData
             });
-
-            //if (!respuesta.ok) throw new Error("Error en la operación del servidor");
 
             if (!respuesta.ok) {
                 const errorData = await respuesta.json();

@@ -1,3 +1,5 @@
+const API_URL = "https://puntotecno.onrender.com"; // URL pública de tu backend en Render
+
 const carrito = JSON.parse(localStorage.getItem('carritoTicket')) || [];
 const cliente = localStorage.getItem('clienteTicket') || localStorage.getItem('cliente') || "Consumidor Final";
 
@@ -8,17 +10,12 @@ if (btnSalir) {
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    /*const usuarioId = localStorage.getItem('usuarioId');
-    if (!usuarioId) {
-        window.location.href = './login-cliente.html';
-    }*/
     const clienteGuardado = localStorage.getItem('clienteTicket') || localStorage.getItem('cliente');
 
     if (!clienteGuardado) {
-    window.location.href = '../index.html';
-    return;
+        window.location.href = '../index.html';
+        return;
     }  
-
 
     mostrarResumenEnPantalla();
 
@@ -90,7 +87,7 @@ async function generarPDF() {
         
         const esOscuro = document.documentElement.getAttribute('data-bs-theme') === 'dark';
 
-        const logoUrl = 'http://localhost:3000/assets/img/favicon.png';
+        const logoUrl = `${API_URL}/assets/img/favicon.png`;
         const logoBytes = await fetch(logoUrl).then(res => res.arrayBuffer());
         const logoImage = await pdfDoc.embedPng(logoBytes);
         const logoDims = logoImage.scale(0.4);

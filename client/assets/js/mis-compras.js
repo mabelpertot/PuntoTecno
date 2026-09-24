@@ -1,3 +1,5 @@
+const API_URL = "https://puntotecno.onrender.com"; // URL pública de tu backend en Render
+
 document.addEventListener("DOMContentLoaded", () => {
 
     cargarCompras();
@@ -15,7 +17,7 @@ async function cargarCompras() {
 
     try {
 
-        const respuesta = await fetch(`http://localhost:3000/api/ventas/usuario/${usuarioId}`);
+        const respuesta = await fetch(`${API_URL}/api/ventas/usuario/${usuarioId}`);
         const ventas = await respuesta.json();
         console.log("VENTAS RECIBIDAS:", ventas);
         renderizarCompras(ventas);

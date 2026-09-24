@@ -1,3 +1,5 @@
+const API_URL = "https://puntotecno.onrender.com"; // URL pública de tu backend en Render
+
 document.addEventListener("DOMContentLoaded", () => {
 
     const form = document.getElementById("registro-form");
@@ -37,7 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
 
             const respuesta = await fetch(
-                "http://localhost:3000/api/auth/registro",
+                `${API_URL}/api/auth/registro`,
                 {
                     method: "POST",
                     headers: {
