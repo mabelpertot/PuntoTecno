@@ -25,7 +25,7 @@ app.use('/api/ventas', ventasRoutes);
 const PORT = process.env.PORT || 3000;
 console.log('🔄 Sincronizando base de datos con MySQL...');
 
-sequelize.sync({ alter: true })
+sequelize.sync({ force: true })
     .then(() => {
         console.log('✅ Base de datos MySQL conectada y sincronizada a la perfección.');
 
