@@ -25,7 +25,7 @@ app.use('/api/ventas', ventasRoutes);
 const PORT = process.env.PORT || 3000;
 console.log('🔄 Sincronizando base de datos con MySQL...');
 
-sequelize.sync({ force: true })
+sequelize.sync({ alter: true })
     .then(() => {
         console.log('✅ Base de datos reconstruida correctamente en Clever Cloud.');
         app.listen(PORT, () => {
