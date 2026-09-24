@@ -1,0 +1,98 @@
+[
+  {
+    "id": 1,
+    "nombre": "Teclado Mecánico RGB",
+    "precio": 8500,
+    "imagen": "../assets/img/teclado.png",
+    "categoria": "Perifericos",
+    "activo": true
+  },
+  {
+    "id": 2,
+    "nombre": "Mouse Gamer Pro",
+    "precio": 4200,
+    "imagen": "../assets/img/mouse.png",
+    "categoria": "Perifericos",
+    "activo": true
+  },
+  {
+    "id": 3,
+    "nombre": "Memoria RAM 16GB",
+    "precio": 12500,
+    "imagen": "../assets/img/memoria.png",
+    "categoria": "Hardware",
+    "activo": true
+  },
+  {
+    "id": 4,
+    "nombre": "Disco SSD 1TB NVMe",
+    "precio": 15000,
+    "imagen": "../assets/img/disco.png",
+    "categoria": "Hardware",
+    "activo": true
+  },
+  {
+    "id": 5,
+    "nombre": "Monitor 24 Full HD",
+    "precio": 45000,
+    "imagen": "../assets/img/monitor.png",
+    "categoria": "Perifericos",
+    "activo": true
+  },
+  {
+    "id": 6,
+    "nombre": "Fuente 750W Bronze",
+    "precio": 18000,
+    "imagen": "../assets/img/fuente.png",
+    "categoria": "Hardware",
+    "activo": true
+  },
+  {
+    "id": 7,
+    "nombre": "Placa de Video RTX",
+    "precio": 350000,
+    "imagen": "../assets/img/placa.png",
+    "categoria": "Hardware",
+    "activo": true
+  },
+  {
+    "id": 8,
+    "nombre": "Auriculares 7.1",
+    "precio": 9800,
+    "imagen": "../assets/img/auriculares.png",
+    "categoria": "Perifericos",
+    "activo": true
+  },
+  {
+    "id": 9,
+    "nombre": "Gabinete Gamer ATX",
+    "precio": 14000,
+    "imagen": "../assets/img/gabinete.png",
+    "categoria": "Hardware",
+    "activo": true
+  },
+  {
+    "id": 10,
+    "nombre": "Webcam Full HD",
+    "precio": 7500,
+    "imagen": "../assets/img/webcam.png",
+    "categoria": "Perifericos",
+    "activo": true
+  },
+  {
+    "id": 11,
+    "nombre": "Procesador i7",
+    "precio": 210000,
+    "imagen": "../assets/img/procesador.png",
+    "categoria": "Hardware",
+    "activo": true
+  },
+  {
+    "id": 12,
+    "nombre": "Pad Mouse XXL",
+    "precio": 3500,
+    "imagen": "../assets/img/pad.png",
+    "categoria": "Perifericos",
+    "activo": true
+  }
+]
