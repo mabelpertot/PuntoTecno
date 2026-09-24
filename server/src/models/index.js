@@ -1,9 +1,9 @@
 const sequelize = require('../config/db');
 const { DataTypes } = require('sequelize');
 
-const Producto = require('./Producto');
-const Venta = require('./Venta');
-const Usuario = require('./Usuario');
+const Producto = require('./producto');
+const Venta = require('./venta');
+const Usuario = require('./usuario');
 
 const Venta_Productos = sequelize.define('Venta_Productos', {
     cantidad: {
