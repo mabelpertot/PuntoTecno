@@ -27,19 +27,12 @@ console.log('🔄 Sincronizando base de datos con MySQL...');
 
 sequelize.sync({ force: true })
     .then(() => {
-        console.log('✅ Base de datos MySQL conectada y sincronizada a la perfección.');
-
-        const server = app.listen(PORT, () => {
-            console.log(`🚀 Servidor corriendo en: http://localhost:${PORT}`);
-        });
-
-        server.on('error', (error) => {
-            console.error('❌ Error en el servidor:', error);
+        console.log('✅ Base de datos reconstruida correctamente en Clever Cloud.');
+        app.listen(PORT, () => {
+            console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
         });
     })
-    .catch(err => {
-        console.error('❌ Error crítico al conectar la base de datos:', err);
-    });
+    .catch(err => console.error('Error al sincronizar:', err));
 
 process.on('exit', (code) => {
     console.log('⚠️ Node se está cerrando con código:', code);
