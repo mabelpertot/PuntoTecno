@@ -30,9 +30,14 @@ document.addEventListener("DOMContentLoaded", () => {
         formBienvenida.addEventListener("submit", (e) => {
             e.preventDefault();
 
-            const nombre = document.getElementById("nombre-cliente").value.trim();
+            const nombreInput = document.getElementById("nombre-cliente");
+            const errorNombre = document.getElementById("error-nombre");
+            const nombre = nombreInput ? nombreInput.value.trim() : "";
 
             if (!nombre) {
+                if (nombreInput) nombreInput.classList.add("is-invalid");
+                if (errorNombre) errorNombre.classList.remove("d-none");
+
                 Swal.fire({
                     icon: "warning",
                     title: "Nombre obligatorio",
@@ -41,21 +46,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            const nombreInput = document.getElementById("nombre-cliente");
-            const errorNombre = document.getElementById("error-nombre");
-
-            const nombre = nombreInput.value.trim();
-
-            if (!nombre) {
-
-                nombreInput.classList.add("is-invalid");
-                errorNombre.classList.remove("d-none");
-
-                return;
-            }
-
-            nombreInput.classList.remove("is-invalid");
-            errorNombre.classList.add("d-none");
+            if (nombreInput) nombreInput.classList.remove("is-invalid");
+            if (errorNombre) errorNombre.classList.add("d-none");
 
             localStorage.setItem("cliente", nombre);
             localStorage.setItem("usuarioLogueado", "true");
