@@ -120,6 +120,16 @@ function actualizarBotones(totalProductos) {
     }
 }
 
+function normalizarTexto(texto) {
+    if (!texto) return "";
+    return texto
+        .toString()
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+}
+
 window.renderizarTienda = function (categoria = "Todos") {
     const contenedor = document.getElementById('lista-productos');
     if (!contenedor) return;
@@ -129,9 +139,14 @@ window.renderizarTienda = function (categoria = "Todos") {
         categoriaActual = categoria;
     }
 
+    const catBuscadaNormalizada = normalizarTexto(categoria);
+
     const productosAMostrar = productosData.filter(p => {
         const estaActivo = (p.activo === true || p.activo === 1 || p.activo === "1" || p.activo === null || p.activo === undefined);
-        const coincideCategoria = (categoria === "Todos" || p.categoria.toLowerCase() === categoria.toLowerCase());
+        
+        const catProductoNormalizada = normalizarTexto(p.categoria);
+        const coincideCategoria = (catBuscadaNormalizada === "todos" || catProductoNormalizada === catBuscadaNormalizada);
+
         return estaActivo && coincideCategoria;
     });
 
