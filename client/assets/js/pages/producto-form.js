@@ -1,11 +1,16 @@
 const API_URL = "https://puntotecno.onrender.com";
 
-if (localStorage.getItem("adminLogueado") !== "true") {
+// Verificación flexible de sesión de Administrador
+const esAdmin = localStorage.getItem("adminLogueado") === "true" || 
+                localStorage.getItem("rol") === "admin" || 
+                localStorage.getItem("token");
+
+if (!esAdmin) {
     window.location.href = "./login.html";
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById("form-producto");
+    const form = document.getElementById("form-producto") || document.getElementById("producto-form");
     const urlParams = new URLSearchParams(window.location.search);
     const productoId = urlParams.get("id"); 
 
@@ -18,11 +23,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 return res.json();
             })
             .then(producto => {
-                document.getElementById("nombre").value = producto.nombre || "";
-                document.getElementById("precio").value = producto.precio || "";
-                document.getElementById("stock").value = producto.stock || "";
-                document.getElementById("categoria").value = producto.categoria || "";
-                document.getElementById("activo").checked = producto.activo == 1 || producto.activo == true;
+                if (document.getElementById("nombre")) document.getElementById("nombre").value = producto.nombre || "";
+                if (document.getElementById("precio")) document.getElementById("precio").value = producto.precio || "";
+                if (document.getElementById("stock")) document.getElementById("stock").value = producto.stock || "";
+                if (document.getElementById("categoria")) document.getElementById("categoria").value = producto.categoria || "";
+                if (document.getElementById("activo")) document.getElementById("activo").checked = producto.activo == 1 || producto.activo == true;
             })
             .catch(err => {
                 console.error("Error al cargar ficha de producto:", err);
@@ -46,12 +51,13 @@ document.addEventListener("DOMContentLoaded", () => {
             formData.append("precio", document.getElementById("precio").value);
             formData.append("stock", document.getElementById("stock").value);
             formData.append("categoria", document.getElementById("categoria").value);
-            formData.append("activo", document.getElementById("activo").checked ? 1 : 0);
+            
+            const activoInput = document.getElementById("activo");
+            formData.append("activo", activoInput ? (activoInput.checked ? 1 : 0) : 1);
 
-            const archivoImagen = document.getElementById("imagen").files[0];
-
-            if (archivoImagen) {
-                formData.append("imagen", archivoImagen);
+            const archivoImagenInput = document.getElementById("imagen");
+            if (archivoImagenInput && archivoImagenInput.files && archivoImagenInput.files[0]) {
+                formData.append("imagen", archivoImagenInput.files[0]);
             }
 
             try {
