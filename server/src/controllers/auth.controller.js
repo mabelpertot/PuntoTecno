@@ -20,7 +20,7 @@ const authController = {
                 nombre,
                 email,
                 password: passwordEncriptada,
-                rol: 'user' 
+                rol: 'client' // Normalizado a 'client'
             });
 
             return res.status(201).json({
@@ -39,21 +39,15 @@ const authController = {
             const { nombre, email, password } = req.body;
 
             if (!nombre || !email || !password) {
-                return res.status(400).json({
-                    error: 'Todos los campos son obligatorios.'
-                });
+                return res.status(400).json({ error: 'Todos los campos son obligatorios.' });
             }
 
             const usuarioExistente = await Usuario.findOne({ where: { email } });
-
             if (usuarioExistente) {
-                return res.status(400).json({
-                    error: 'El email ya está registrado.'
-                });
+                return res.status(400).json({ error: 'El email ya está registrado.' });
             }
 
             const passwordEncriptada = await bcrypt.hash(password, 10);
-
             const admin = await Usuario.create({
                 nombre,
                 email,
@@ -73,63 +67,51 @@ const authController = {
 
         } catch (error) {
             console.error('Error al crear administrador:', error);
-            return res.status(500).json({
-                error: 'Error interno al crear administrador.'
-            });
+            return res.status(500).json({ error: 'Error interno al crear administrador.' });
         }
     },
 
-        login: async (req, res) => {
-    try {
-        const { email, password } = req.body;
+    login: async (req, res) => {
+        try {
+            const { email, password } = req.body;
 
-        if (!email || !password) {
-            return res.status(400).json({
-                error: 'Email y contraseña son obligatorios.'
-            });
-        }
-
-        const usuario = await Usuario.findOne({ where: { email } });
-
-        if (!usuario) {
-            return res.status(401).json({
-                error: 'Credenciales inválidas.'
-            });
-        }
-
-        let passwordValida = false;
-
-        if (
-            usuario.password.startsWith('$2b$') ||
-            usuario.password.startsWith('$2a$')
-        ) {
-            passwordValida = await bcrypt.compare(password, usuario.password);
-        } else {
-            passwordValida = usuario.password === password;
-        }
-
-        if (!passwordValida) {
-            return res.status(401).json({
-                error: 'Credenciales inválidas.'
-            });
-        }
-
-        return res.json({
-            mensaje: '¡Ingreso exitoso!',
-            usuario: {
-                id: usuario.id,
-                nombre: usuario.nombre,
-                email: usuario.email,
-                rol: usuario.rol
+            if (!email || !password) {
+                return res.status(400).json({ error: 'Email y contraseña son obligatorios.' });
             }
-        });
 
-    } catch (error) {
-        console.error('Error en el login:', error);
-        return res.status(500).json({
-            error: 'Error interno al procesar el ingreso.'});
+            const usuario = await Usuario.findOne({ where: { email } });
+
+            if (!usuario) {
+                return res.status(401).json({ error: 'Credenciales inválidas.' });
+            }
+
+            // Comparar directamente con bcrypt; si falla intenta texto plano por compatibilidad
+            let passwordValida = false;
+            try {
+                passwordValida = await bcrypt.compare(password, usuario.password);
+            } catch (err) {
+                passwordValida = (usuario.password === password);
+            }
+
+            if (!passwordValida) {
+                return res.status(401).json({ error: 'Credenciales inválidas.' });
+            }
+
+            return res.json({
+                mensaje: '¡Ingreso exitoso!',
+                usuario: {
+                    id: usuario.id,
+                    nombre: usuario.nombre,
+                    email: usuario.email,
+                    rol: usuario.rol
+                }
+            });
+
+        } catch (error) {
+            console.error('Error en el login:', error);
+            return res.status(500).json({ error: 'Error interno al procesar el ingreso.' });
         }
     }
-    
 };
-module.exports = authController
+
+module.exports = authController;
