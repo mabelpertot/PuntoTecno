@@ -6,9 +6,11 @@ const path = require('path');
 const validateProducto = require('../../middlewares/producto.validation');
 const productoController = require('../../controllers/producto.controller');
 
+// Configuración de destino a server/public/images
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, path.join(__dirname, '../../../public/images'));
+        // Apunta correctamente a server/public/images
+        cb(null, path.join(__dirname, '../../public/images'));
     },
     filename: (req, file, cb) => {
         const nombreUnico = Date.now() + '-' + file.originalname;
@@ -18,19 +20,29 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
+// Middleware para capturar imágenes subidas sin bloquear peticiones JSON/Texto
+const manejarSubida = (req, res, next) => {
+    upload.single('imagen')(req, res, (err) => {
+        if (err) {
+            console.error("Error en Multer:", err);
+        }
+        next();
+    });
+};
+
 router.get('/', productoController.listarTodos);
 router.get('/:id', productoController.obtenerPorId);
 
 router.post(
     '/',
-    upload.single('imagen'),
+    manejarSubida,
     validateProducto,
     productoController.crearProducto
 );
 
 router.put(
     '/:id',
-    upload.single('imagen'),
+    manejarSubida,
     productoController.actualizarProducto
 );
 
