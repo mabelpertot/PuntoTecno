@@ -28,6 +28,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (document.getElementById("stock")) document.getElementById("stock").value = producto.stock || "";
                 if (document.getElementById("categoria")) document.getElementById("categoria").value = producto.categoria || "";
                 if (document.getElementById("activo")) document.getElementById("activo").checked = producto.activo == 1 || producto.activo == true;
+                
+                // Si la imagen actual es una URL, poblar el campo URL
+                const urlInput = document.getElementById("imagen-url");
+                if (urlInput && producto.imagen && producto.imagen.startsWith("http")) {
+                    urlInput.value = producto.imagen;
+                }
             })
             .catch(err => {
                 console.error("Error al cargar ficha de producto:", err);
@@ -45,34 +51,61 @@ document.addEventListener("DOMContentLoaded", () => {
         form.addEventListener("submit", async (e) => {
             e.preventDefault();
 
-            const formData = new FormData();
-
-            formData.append("nombre", document.getElementById("nombre").value.trim());
-            formData.append("precio", document.getElementById("precio").value);
-            formData.append("stock", document.getElementById("stock").value);
-            formData.append("categoria", document.getElementById("categoria").value);
-            
+            const nombre = document.getElementById("nombre")?.value.trim();
+            const precio = document.getElementById("precio")?.value;
+            const stock = document.getElementById("stock")?.value;
+            const categoria = document.getElementById("categoria")?.value;
             const activoInput = document.getElementById("activo");
-            formData.append("activo", activoInput ? (activoInput.checked ? 1 : 0) : 1);
+            const activo = activoInput ? (activoInput.checked ? 1 : 0) : 1;
 
-            const archivoImagenInput = document.getElementById("imagen");
-            if (archivoImagenInput && archivoImagenInput.files && archivoImagenInput.files[0]) {
-                formData.append("imagen", archivoImagenInput.files[0]);
+            const archivoInput = document.getElementById("imagen-file") || document.getElementById("imagen");
+            const urlInput = document.getElementById("imagen-url")?.value.trim();
+            
+            const archivoSeleccionado = archivoInput && archivoInput.files && archivoInput.files[0];
+
+            let url = `${API_URL}/api/productos`;
+            let metodo = "POST"; 
+
+            if (productoId && productoId !== "null" && productoId !== "undefined") {
+                url = `${API_URL}/api/productos/${productoId}`;
+                metodo = "PUT"; 
             }
 
             try {
-                let url = `${API_URL}/api/productos`;
-                let metodo = "POST"; 
+                let respuesta;
 
-                if (productoId && productoId !== "null" && productoId !== "undefined") {
-                    url = `${API_URL}/api/productos/${productoId}`;
-                    metodo = "PUT"; 
+                // CASO 1: Se adjuntó un archivo físico -> Usar FormData (Multipart)
+                if (archivoSeleccionado) {
+                    const formData = new FormData();
+                    formData.append("nombre", nombre);
+                    formData.append("precio", precio);
+                    formData.append("stock", stock);
+                    formData.append("categoria", categoria);
+                    formData.append("activo", activo);
+                    formData.append("imagen", archivoSeleccionado);
+
+                    respuesta = await fetch(url, {
+                        method: metodo,
+                        body: formData
+                    });
+                } 
+                // CASO 2: Se usó una URL externa o texto -> Usar JSON (para que la API reciba 'imagen' como String)
+                else {
+                    const payload = {
+                        nombre,
+                        precio,
+                        stock,
+                        categoria,
+                        activo,
+                        imagen: urlInput || "favicon.png"
+                    };
+
+                    respuesta = await fetch(url, {
+                        method: metodo,
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(payload)
+                    });
                 }
-
-                const respuesta = await fetch(url, {
-                    method: metodo,
-                    body: formData
-                });
 
                 if (!respuesta.ok) {
                     const errorData = await respuesta.json();
