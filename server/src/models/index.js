@@ -1,4 +1,4 @@
-const sequelize = require('../config/db');
+const sequelize = require('./config/db');
 const { DataTypes } = require('sequelize');
 
 const Producto = require('./producto');
@@ -15,7 +15,6 @@ const Venta_Productos = sequelize.define('Venta_Productos', {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false
     },
-
     createdAt: {
         type: DataTypes.DATE,
         allowNull: false,
@@ -31,17 +30,22 @@ const Venta_Productos = sequelize.define('Venta_Productos', {
     timestamps: true 
 });
 
-Usuario.hasMany(Venta, { foreignKey: 'usuario_id', as: 'ventas' });
-Venta.belongsTo(Usuario, { foreignKey: 'usuario_id', as: 'usuario' });
+// Relación Usuario <-> Venta
+Usuario.hasMany(Venta, { foreignKey: 'usuarioId', as: 'ventas' });
+Venta.belongsTo(Usuario, { foreignKey: 'usuarioId', as: 'usuario' });
 
+// Relación N:M Venta <-> Producto a través de Venta_Productos
 Venta.belongsToMany(Producto, { 
     through: Venta_Productos, 
-    foreignKey: 'venta_id', 
+    foreignKey: 'ventaId', 
+    otherKey: 'productoId',
     as: 'Productos'
 });
+
 Producto.belongsToMany(Venta, { 
     through: Venta_Productos, 
-    foreignKey: 'producto_id', 
+    foreignKey: 'productoId', 
+    otherKey: 'ventaId',
     as: 'ventas' 
 });
 
