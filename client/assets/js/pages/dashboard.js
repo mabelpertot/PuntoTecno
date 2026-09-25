@@ -1,6 +1,8 @@
 const API_URL = "https://puntotecno.onrender.com";
 
-if (localStorage.getItem("adminLogueado") !== "true") {
+// Verificación flexible de la sesión de Administrador
+const esAdmin = localStorage.getItem("adminLogueado") === "true" || localStorage.getItem("rol") === "admin";
+if (!esAdmin) {
     window.location.href = "./login.html";
 }
 
@@ -118,6 +120,8 @@ window.editarProducto = function(id) {
 
 window.cerrarSesion = function() {
     localStorage.removeItem("adminLogueado");
+    localStorage.removeItem("rol");
+    localStorage.removeItem("token");
     window.location.href = "./login.html";
 };
 
@@ -151,9 +155,7 @@ window.cambiarEstado = function(id) {
                     title: nuevoEstado ? "Producto activado" : "Producto desactivado",
                     timer: 1200,
                     showConfirmButton: false
-                });
-
-                await inicializarDashboard();
+                }).then(() => inicializarDashboard());
             } catch (err) {
                 Swal.fire({ icon: "error", title: "Error", text: "No se pudo actualizar la base de datos." });
             }

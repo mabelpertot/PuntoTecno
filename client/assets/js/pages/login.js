@@ -33,16 +33,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 throw new Error(data.message || data.error || "Credenciales incorrectas");
             }
 
-            // Normalización del objeto de usuario sin importar la estructura que devuelva Render
             const usuarioObj = data.usuario || data.user || data;
             const rolDetectado = (usuarioObj.rol || data.rol || "").toLowerCase();
 
-            // Verificación flexible del rol Administrador
             if (rolDetectado === "admin" || email === "admin@puntotecno.com") {
+                // Guardado estandarizado para dashboard.js
                 localStorage.setItem("token", data.token || "session-admin");
                 localStorage.setItem("usuarioId", usuarioObj.id || 1);
                 localStorage.setItem("usuarioLogueado", usuarioObj.nombre || "Administrador");
+                localStorage.setItem("cliente", usuarioObj.nombre || "Administrador");
                 localStorage.setItem("rol", "admin");
+                localStorage.setItem("usuario", JSON.stringify(usuarioObj));
 
                 Swal.fire({
                     icon: "success",
