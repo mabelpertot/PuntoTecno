@@ -56,6 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const data = await respuesta.json();
 
             if (!respuesta.ok) {
+                const mensajeError = data.errors ? data.errors.map(err => err.msg).join(", ") : (data.error || "No fue posible registrar el usuario.")
                 throw new Error(
                     data.error ||
                     "No fue posible registrar el usuario."
