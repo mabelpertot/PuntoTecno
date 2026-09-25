@@ -1,29 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
-    const botonesAdmin =
-        document.querySelectorAll(".btn-admin");
-
-    botonesAdmin.forEach(btn => {
-
-        btn.addEventListener("click", () => {
-            
-            window.location.href = "./pages/admin/login.html";
-        });
-
-    });
-
-});
-
-document.addEventListener("DOMContentLoaded", () => {
-
-    const botonesAdmin = document.querySelectorAll(".btn-admin");
-
-    botonesAdmin.forEach(btn => {
-        btn.addEventListener("click", () => {
-            window.location.href = "./pages/admin/login.html";
-        });
-    });
-
     const formBienvenida = document.getElementById("bienvenida-form");
 
     if (formBienvenida) {
@@ -58,6 +33,4 @@ document.addEventListener("DOMContentLoaded", () => {
             window.location.href = "./pages/productos.html";
         });
     }
-
 });
-

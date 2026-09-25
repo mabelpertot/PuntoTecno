@@ -1,8 +1,6 @@
 const htmlElement = document.documentElement;
-
 const temaGuardado = localStorage.getItem('tema') || 'light';
 htmlElement.setAttribute('data-bs-theme', temaGuardado);
-
 
 document.addEventListener("DOMContentLoaded", () => {
     const btnTema = document.getElementById('btn-tema');
@@ -37,6 +35,14 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     }
+
+    // Listener para redirección al login de admin si existe el botón
+    const botonesAdmin = document.querySelectorAll(".btn-admin");
+    botonesAdmin.forEach(btn => {
+        btn.addEventListener("click", () => {
+            window.location.href = "./pages/admin/login.html";
+        });
+    });
 });
 
 function sincronizarComponentesVisuales(tema, btnTema, iconoTema) {

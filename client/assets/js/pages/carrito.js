@@ -1,242 +1,206 @@
-const API_URL = "https://puntotecno.onrender.com"; // Reemplazá por tu URL de Render
+const API_URL = "https://puntotecno.onrender.com";
+
 let carrito = JSON.parse(localStorage.getItem('carritoActual')) || [];
-const usuarioId = localStorage.getItem('usuarioId');
 
 document.addEventListener('DOMContentLoaded', () => {
-    renderizarResumen();
+    const usuarioLogueado = localStorage.getItem("usuarioLogueado");
+    if (!usuarioLogueado) {
+        window.location.href = './login-cliente.html';
+        return;
+    }
+
+    renderizarCarrito();
 
     const btnConfirmar = document.getElementById('btn-confirmar');
-    if (btnConfirmar) btnConfirmar.onclick = finalizarCompra;
-
     const btnVaciar = document.getElementById('btn-vaciar');
-    if (btnVaciar) btnVaciar.onclick = vaciarCarritoCompleto;
+
+    if (btnConfirmar) btnConfirmar.onclick = confirmarPedido;
+    if (btnVaciar) btnVaciar.onclick = vaciarCarrito;
 });
 
-function renderizarResumen() {
+function renderizarCarrito() {
     const contenedor = document.getElementById('lista-productos');
-    const totalTxt = document.getElementById('total-resumen');
-    const cantTxt = document.getElementById('cant-items');
+    const cantItemsSpan = document.getElementById('cant-items');
+    const totalResumenSpan = document.getElementById('total-resumen');
 
     if (!contenedor) return;
 
     if (carrito.length === 0) {
         contenedor.innerHTML = `
-            <div class="text-center p-5 bg-body-tertiary rounded-4">
-                <i class="bi bi-cart-x display-1 text-secondary"></i>
-                <p class="mt-3">Tu carrito está actualmente vacío.</p>
+            <div class="text-center py-5 text-muted">
+                <i class="bi bi-cart-x display-1 d-block mb-3"></i>
+                <h4 class="fw-bold">Tu carrito está vacío</h4>
+                <p>Agregá productos desde el catálogo para continuar.</p>
             </div>`;
-        if (totalTxt) totalTxt.innerText = "$0";
-        if (cantTxt) cantTxt.innerText = "0";
+        if (cantItemsSpan) cantItemsSpan.innerText = "0";
+        if (totalResumenSpan) totalResumenSpan.innerText = "$0";
         return;
     }
 
-    let totalAcumulado = 0;
-    let totalCant = 0;
+    let totalCalculado = 0;
+    let itemsTotales = 0;
 
-    contenedor.innerHTML = carrito.map(p => {
+    contenedor.innerHTML = carrito.map((p, index) => {
         const subtotal = p.precio * p.cantidad;
-        totalAcumulado += subtotal;
-        totalCant += p.cantidad;
+        totalCalculado += subtotal;
+        itemsTotales += p.cantidad;
 
         return `
-            <div class="card card-carrito shadow-sm p-3 mb-3 border-0 rounded-4">
-                <div class="row align-items-center">
-                    <div class="col-3 col-md-2">
-                        <img src="${p.imagen}" class="item-carrito-img img-fluid rounded" alt="${p.nombre}">
+            <div class="card border-0 shadow-sm rounded-3 p-3">
+                <div class="row align-items-center g-3">
+                    <div class="col-3 col-md-2 text-center">
+                        <img src="${p.imagen}" alt="${p.nombre}" class="img-fluid rounded-2" style="max-height: 70px; object-fit: contain;" onerror="this.src='../assets/img/favicon.png'">
                     </div>
-                    <div class="col-9 col-md-5">
-                        <h5 class="mb-0 fw-bold">${p.nombre}</h5>
-                        <small class="text-secondary">Precio unitario: $${parseFloat(p.precio).toLocaleString('es-AR')}</small>
+                    <div class="col-9 col-md-4">
+                        <h6 class="fw-bold mb-1 text-truncate">${p.nombre}</h6>
+                        <span class="badge bg-secondary-subtle text-secondary-emphasis rounded-pill small">${p.categoria}</span>
                     </div>
-                    <div class="col-12 col-md-5 d-flex align-items-center justify-content-md-end gap-2 mt-3 mt-md-0">
-                        <button class="btn btn-sm btn-outline-secondary rounded-circle" onclick="actualizarCantidad(${p.id}, -1)">
-                            <i class="bi bi-dash"></i>
-                        </button>
+                    <div class="col-6 col-md-3 d-flex align-items-center justify-content-center gap-2">
+                        <button class="btn btn-outline-secondary btn-sm rounded-circle px-2" onclick="cambiarCantidad(${index}, -1)">-</button>
                         <span class="fw-bold px-2">${p.cantidad}</span>
-                        <button class="btn btn-sm btn-outline-secondary rounded-circle" onclick="actualizarCantidad(${p.id}, 1)">
-                            <i class="bi bi-plus"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger ms-3 rounded-pill" onclick="eliminarProducto(${p.id})">
-                            <i class="bi bi-trash"></i> Borrar
+                        <button class="btn btn-outline-secondary btn-sm rounded-circle px-2" onclick="cambiarCantidad(${index}, 1)">+</button>
+                    </div>
+                    <div class="col-6 col-md-3 text-end">
+                        <span class="fw-bold text-primary h6 mb-0 d-block">$${subtotal.toLocaleString('es-AR')}</span>
+                        <button class="btn btn-link text-danger p-0 small text-decoration-none" onclick="eliminarItem(${index})">
+                            <i class="bi bi-trash me-1"></i>Quitar
                         </button>
                     </div>
                 </div>
             </div>`;
     }).join('');
 
-    if (totalTxt) totalTxt.innerText = `$${totalAcumulado.toLocaleString('es-AR')}`;
-    if (cantTxt) cantTxt.innerText = totalCant; 
+    if (cantItemsSpan) cantItemsSpan.innerText = itemsTotales;
+    if (totalResumenSpan) totalResumenSpan.innerText = `$${totalCalculado.toLocaleString('es-AR')}`;
 }
 
-window.actualizarCantidad = (id, cambio) => {
-    localStorage.setItem('compraConfirmada', 'false');
-    const producto = carrito.find(p => p.id === id);
-    
-    if (producto) {
-        producto.cantidad += cambio;
+window.cambiarCantidad = function(index, cambio) {
+    if (!carrito[index]) return;
 
-        if (producto.cantidad <= 0) {
-            carrito = carrito.filter(p => p.id !== id);
-        } else {
-            Swal.fire({
-                title: 'Carrito actualizado',
-                text: `${producto.nombre}: ${producto.cantidad} un.`,
-                icon: 'success',
-                timer: 1000,
-                showConfirmButton: false,
-                toast: true,
-                position: 'bottom-end'
-            });
-        }
+    const producto = carrito[index];
+    const nuevaCantidad = producto.cantidad + cambio;
+
+    if (nuevaCantidad <= 0) {
+        eliminarItem(index);
+        return;
     }
-    guardarYRefrescar();
+
+    if (nuevaCantidad > Number(producto.stock)) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Límite de stock',
+            text: `Solo disponemos de ${producto.stock} unidades.`,
+            confirmButtonColor: '#06b6d4'
+        });
+        return;
+    }
+
+    producto.cantidad = nuevaCantidad;
+    producto.quantity = nuevaCantidad;
+    guardarYActualizar();
 };
 
-window.eliminarProducto = (id) => {
-    const producto = carrito.find(p => p.id === id);
-    if (!producto) return;
-
-    carrito = carrito.filter(p => p.id !== id);
-
-    Swal.fire({
-        title: 'Producto eliminado',
-        text: `${producto.nombre} se quitó del carrito`,
-        icon: 'info',
-        timer: 1500,
-        showConfirmButton: false, 
-        toast: true,
-        position: 'bottom-end'
-    });
-
-    guardarYRefrescar();
+window.eliminarItem = function(index) {
+    carrito.splice(index, 1);
+    guardarYActualizar();
 };
 
-function vaciarCarritoCompleto() {
-    Swal.fire({
-        title: "¿Vaciar carrito?",
-        text: "Se eliminarán todos los productos agregados.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Sí, vaciar",
-        cancelButtonText: "Cancelar",
-        confirmButtonColor: "#dc3545",
-        reverseButtons: true
-    }).then((result) => {
-        if (result.isConfirmed) {
-            localStorage.removeItem("carritoActual");
-            carrito = [];
-
-            Swal.fire({
-                icon: "success",
-                title: "Carrito vacío",
-                text: "Redirigiendo a la tienda...",
-                timer: 3000,
-                showConfirmButton: false,
-                timerProgressBar: true
-            }).then(() => {
-                window.location.href = "./productos.html";
-            });
-        }
-    });
-}
-
-async function finalizarCompra() {
+window.vaciarCarrito = function() {
     if (carrito.length === 0) return;
 
-    const total = carrito.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
-
-    const result = await Swal.fire({
-        title: '¿Confirmar Pedido?',
-        text: `El total de tu compra es $${total.toLocaleString('es-AR')}`,
-        icon: 'question',
+    Swal.fire({
+        title: '¿Vaciar carrito?',
+        text: 'Se eliminarán todos los productos seleccionados.',
+        icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Sí, finalizar',
-        cancelButtonText: 'No, volver',
-        confirmButtonColor: '#06b6d4',
-        cancelButtonColor: '#64748b',
-        reverseButtons: true
-    });
-
-    if (result.isConfirmed) {
-        Swal.fire({
-            title: 'Procesando tu pedido...',
-            text: 'Estamos registrando la venta en nuestro sistema.',
-            allowOutsideClick: false,
-            didOpen: () => {
-                Swal.showLoading();
-            }
-        });
-
-        try {
-            const datosVenta = {
-                usuario_id: localStorage.getItem('usuarioId'),
-                total: total,
-                productos: carrito.map(p => ({
-                    id: p.id,
-                    cantidad: p.cantidad,
-                    precio: p.precio
-                }))
-            };
-
-            const respuesta = await fetch(`${API_URL}/api/ventas`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(datosVenta)
-            });
-
-            const resultadoAPI = await respuesta.json();
-
-            if (!respuesta.ok) {
-                throw new Error(resultadoAPI.error || 'Error al procesar la venta.');
-            }
-
-            localStorage.setItem('compraConfirmada', 'true');
-            localStorage.setItem('ultimaVentaId', resultadoAPI.ventaId); 
-
-            localStorage.setItem('carritoTicket', JSON.stringify(carrito));
-            localStorage.setItem('clienteTicket', localStorage.getItem('cliente') || "Consumidor Final");
-
-            localStorage.removeItem('carritoActual');
+        confirmButtonText: 'Sí, vaciar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#dc3545'
+    }).then((res) => {
+        if (res.isConfirmed) {
             carrito = [];
-
-            window.location.href = './ticket.html';
-
-        } catch (error) {
-            console.error('Error al procesar la venta:', error);
-            Swal.fire({
-                title: 'Error al finalizar la compra',
-                text: error.message || 'No se pudo conectar con el servidor.',
-                icon: 'error',
-                confirmButtonColor: '#ef4444'
-            });
+            guardarYActualizar();
         }
-    }
+    });
+};
+
+function guardarYActualizar() {
+    localStorage.setItem('carritoActual', JSON.stringify(carrito));
+    renderizarCarrito();
 }
 
-function guardarYRefrescar() {
-    localStorage.setItem('carritoActual', JSON.stringify(carrito));
-    renderizarResumen();
+async function confirmarPedido() {
+    if (carrito.length === 0) return;
 
-    if (carrito.length === 0) {
-        const esOscuro = document.documentElement.getAttribute('data-bs-theme') === 'dark';
+    const usuarioId = localStorage.getItem("usuarioId");
+    const cliente = localStorage.getItem("cliente") || "Consumidor Final";
 
+    if (!usuarioId) {
         Swal.fire({
-            title: 'Carrito vacío',
-            text: 'No quedan elementos. ¿A dónde deseas ir?',
-            icon: 'info',
-            showCancelButton: true,
-            confirmButtonText: 'Ir a Inicio',
-            cancelButtonText: 'Volver a Tienda',
-            background: esOscuro ? '#333' : '#fff',
-            color: esOscuro ? '#fff' : '#000'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                window.location.href = "../index.html";
-            } else {
-                window.location.href = "./productos.html";
-            }
+            icon: 'error',
+            title: 'Sesión expirada',
+            text: 'Iniciá sesión nuevamente para registrar la compra.'
+        }).then(() => window.location.href = './login-cliente.html');
+        return;
+    }
+
+    const totalCalculado = carrito.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
+
+    const datosVenta = {
+        usuarioId: Number(usuarioId),
+        cliente,
+        total: totalCalculado,
+        productos: carrito.map(p => ({
+            id: p.id,
+            cantidad: p.cantidad,
+            precio: p.precio
+        }))
+    };
+
+    try {
+        Swal.fire({
+            title: 'Procesando compra...',
+            text: 'Registrando la venta en Clever Cloud',
+            allowOutsideClick: false,
+            didOpen: () => Swal.showLoading()
+        });
+
+        const respuesta = await fetch(`${API_URL}/api/ventas`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datosVenta)
+        });
+
+        const data = await respuesta.json();
+
+        if (!respuesta.ok) {
+            throw new Error(data.error || "No se pudo concretar la venta.");
+        }
+
+        // Guardar respaldo para generar comprobante
+        localStorage.setItem('carritoTicket', JSON.stringify(carrito));
+        localStorage.setItem('clienteTicket', cliente);
+        localStorage.setItem('ultimaVentaId', data.venta ? data.venta.id : Date.now());
+
+        // Limpiar carrito actual de la sesión
+        localStorage.removeItem('carritoActual');
+
+        await Swal.fire({
+            icon: 'success',
+            title: '¡Compra exitosa!',
+            text: 'Tu pedido ha sido procesado correctamente.',
+            timer: 1500,
+            showConfirmButton: false
+        });
+
+        window.location.href = './ticket.html';
+
+    } catch (err) {
+        console.error("Error al confirmar pedido:", err);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error en la transacción',
+            text: err.message
         });
     }
 }

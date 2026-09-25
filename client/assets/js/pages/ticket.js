@@ -1,15 +1,9 @@
-const API_URL = "https://puntotecno.onrender.com"; // URL pública de tu backend en Render
+const API_URL = "https://puntotecno.onrender.com";
 
 const carrito = JSON.parse(localStorage.getItem('carritoTicket')) || [];
 const cliente = localStorage.getItem('clienteTicket') || localStorage.getItem('cliente') || "Consumidor Final";
 
-const btnSalir = document.getElementById('btn-salir');
-if (btnSalir) {
-    btnSalir.onclick = salir;
-}
-
 document.addEventListener('DOMContentLoaded', () => {
-
     const clienteGuardado = localStorage.getItem('clienteTicket') || localStorage.getItem('cliente');
 
     if (!clienteGuardado) {
@@ -20,7 +14,10 @@ document.addEventListener('DOMContentLoaded', () => {
     mostrarResumenEnPantalla();
 
     const btnDescargar = document.getElementById('btn-descargar');
+    const btnSalir = document.getElementById('btn-salir');
+
     if (btnDescargar) btnDescargar.onclick = generarPDF;
+    if (btnSalir) btnSalir.onclick = salir;
 });
 
 function mostrarResumenEnPantalla() {
@@ -87,15 +84,9 @@ async function generarPDF() {
         
         const esOscuro = document.documentElement.getAttribute('data-bs-theme') === 'dark';
 
-        const logoUrl = `${API_URL}/assets/img/favicon.png`;
-        const logoBytes = await fetch(logoUrl).then(res => res.arrayBuffer());
-        const logoImage = await pdfDoc.embedPng(logoBytes);
-        const logoDims = logoImage.scale(0.4);
-
         let y = alturaCalculada - 50;
 
-        page.drawImage(logoImage, { x: 40, y: y - 5, width: logoDims.width, height: logoDims.height });
-        page.drawText("PUNTO TECNO S.A.", { x: 80, y, size: 20, font: fontBold, color: rgb(0.02, 0.45, 0.88) });
+        page.drawText("PUNTO TECNO S.A.", { x: 40, y, size: 20, font: fontBold, color: rgb(0.02, 0.45, 0.88) });
         
         y -= 45;
         page.drawText(`CLIENTE: ${cliente.toUpperCase()}`, { x: 40, y, size: 10, font: fontNormal, color: rgb(0.2, 0.2, 0.2) });
@@ -121,7 +112,7 @@ async function generarPDF() {
 
         const totalFinal = carrito.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
         page.drawText("TOTAL LIQUIDADO:", { x: 40, y, size: 14, font: fontBold });
-        page.drawText(`$${totalFinal.toLocaleString('es-AR')}`, { x: 290, y, size: 14, font: fontBold, color: rgb(0.02, 0.45, 0.88) });
+        page.drawText(`$${totalFinal.toLocaleString('es-AR')}`, { x: 270, y, size: 14, font: fontBold, color: rgb(0.02, 0.45, 0.88) });
 
         const pdfBytes = await pdfDoc.save();
         const blob = new Blob([pdfBytes], { type: 'application/pdf' });
@@ -138,13 +129,12 @@ async function generarPDF() {
                 background: esOscuro ? '#333' : '#fff',
                 color: esOscuro ? '#fff' : '#000',
                 timer: 2500,
-                timerProgressBar: true,
                 showConfirmButton: false
             });
         }, 800);
 
     } catch (error) {
-        console.error("Error al procesar el documento PDF mediante PDF-Lib:", error);
+        console.error("Error al procesar el documento PDF:", error);
         Swal.fire('Error de Impresión', 'Ocurrió un inconveniente al empaquetar el comprobante.', 'error');
     }
 }
@@ -160,7 +150,6 @@ function salir() {
         text: 'Regresando a la pantalla de bienvenida...',
         icon: 'success',
         timer: 2500,
-        timerProgressBar: true,
         showConfirmButton: false
     }).then(() => {
         window.location.href = '../index.html';

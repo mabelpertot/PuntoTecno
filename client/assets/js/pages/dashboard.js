@@ -1,10 +1,36 @@
-const API_URL = "https://puntotecno.onrender.com"; // URL pública de tu backend en Render
+const API_URL = "https://puntotecno.onrender.com";
 
 if (localStorage.getItem("adminLogueado") !== "true") {
     window.location.href = "./login.html";
 }
 
 let productos = [];
+
+document.addEventListener("DOMContentLoaded", () => {
+    const buscador = document.getElementById("buscar-producto");
+    const filtroCategoria = document.getElementById("filtro-categoria");
+    const ordenarProductos = document.getElementById("ordenar-productos");
+
+    const refrescarTabla = () => {
+        renderizarProductos(
+            buscador?.value || "",
+            filtroCategoria?.value || "Todos",
+            ordenarProductos?.value || ""
+        );
+    };
+
+    buscador?.addEventListener("input", refrescarTabla);
+    filtroCategoria?.addEventListener("change", refrescarTabla);
+    ordenarProductos?.addEventListener("change", refrescarTabla);
+
+    inicializarDashboard();
+});
+
+async function inicializarDashboard() {
+    await obtenerProductosDesdeAPI();
+    await renderizarVentas();
+    await renderizarEstadisticas();
+}
 
 async function obtenerProductosDesdeAPI() {
     try {
@@ -18,14 +44,6 @@ async function obtenerProductosDesdeAPI() {
     } catch (error) {
         console.error("Error al sincronizar productos:", error);
     }
-}
-
-function refrescarDashboard() {
-    const buscador = document.getElementById("buscar-producto")?.value || "";
-    const categoria = document.getElementById("filtro-categoria")?.value || "Todos";
-    const orden = document.getElementById("ordenar-productos")?.value || "";
-    
-    renderizarProductos(buscador, categoria, orden);
 }
 
 function renderizarProductos(filtro = "", categoria = "Todos", orden = "") {
@@ -57,11 +75,11 @@ function renderizarProductos(filtro = "", categoria = "Todos", orden = "") {
         <tr>
             <td>${producto.id}</td>
             <td>
-                <img src="${producto.imagen && producto.imagen.startsWith('http') ? producto.imagen : API_URL + '/assets/img/' + (producto.imagen || 'favicon.png')}" 
+                <img src="${producto.imagen && producto.imagen.startsWith('http') ? producto.imagen : '../../assets/img/' + (producto.imagen || 'favicon.png')}" 
                     alt="${producto.nombre}" 
                     width="60" 
                     class="rounded shadow-sm" 
-                    onerror="this.src='${API_URL}/assets/img/favicon.png'">
+                    onerror="this.src='../../assets/img/favicon.png'">
             </td>
             <td>${producto.nombre}</td>
             <td>${producto.categoria}</td>
@@ -90,20 +108,18 @@ function renderBadgeEstado(activo) {
         : `<span class="badge bg-danger">Inactivo</span>`;
 }
 
-function agregarProducto() {
+window.agregarProducto = function() {
     window.location.href = "./producto-form.html";
-}
+};
 
-function editarProducto(id) {
+window.editarProducto = function(id) {
     window.location.href = `./producto-form.html?id=${id}`;
-}
+};
 
-function cerrarSesion() {
+window.cerrarSesion = function() {
     localStorage.removeItem("adminLogueado");
     window.location.href = "./login.html";
-}
-
-window.editarProducto = editarProducto;
+};
 
 window.cambiarEstado = function(id) {
     const producto = productos.find(p => p.id === id);
@@ -146,7 +162,7 @@ window.cambiarEstado = function(id) {
 };
 
 async function renderizarVentas() {
-    const tablaVentas = document.getElementById("tabla-nav-ventas") || document.getElementById("tabla-ventas");
+    const tablaVentas = document.getElementById("tabla-ventas");
     if (!tablaVentas) return;
 
     try {
@@ -234,29 +250,3 @@ window.descargarExcelVentas = async function() {
         console.error("Error al descargar Excel:", err);
     }
 };
-
-async function inicializarDashboard() {
-    await obtenerProductosDesdeAPI();
-    await renderizarVentas();
-    await renderizarEstadisticas();
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-    const buscador = document.getElementById("buscar-producto");
-    const filtroCategoria = document.getElementById("filtro-categoria");
-    const ordenarProductos = document.getElementById("ordenar-productos");
-
-    const refrescarTabla = () => {
-        renderizarProductos(
-            buscador?.value || "",
-            filtroCategoria?.value || "Todos",
-            ordenarProductos?.value || ""
-        );
-    };
-
-    buscador?.addEventListener("input", refrescarTabla);
-    filtroCategoria?.addEventListener("change", refrescarTabla);
-    ordenarProductos?.addEventListener("change", refrescarTabla);
-
-    inicializarDashboard();
-});

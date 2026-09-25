@@ -1,4 +1,4 @@
-const API_URL = "https://puntotecno.onrender.com"; // URL pública de tu backend en Render
+const API_URL = "https://puntotecno.onrender.com";
 
 let productosData = [];
 let carrito = JSON.parse(localStorage.getItem('carritoActual')) || [];
@@ -9,10 +9,7 @@ const productosPorPagina = 8;
 document.addEventListener('DOMContentLoaded', () => {
     const nombreUsuario = localStorage.getItem("cliente");
 
-    const usuarioId = localStorage.getItem('usuarioId');
-
     if (!nombreUsuario) {
-        window.location.href = './index.html';
         window.location.href = './login-cliente.html';
         return;
     }
@@ -26,44 +23,40 @@ document.addEventListener('DOMContentLoaded', () => {
         spanUsuario.classList.remove("d-none");
     }
 
-    if (btnLogout) {
-        btnLogout.classList.remove("d-none");
+    if (btnLogout) btnLogout.classList.remove("d-none");
+    if (linkMisCompras) linkMisCompras.classList.remove("d-none");
+
+    const btnAnt = document.getElementById('btn-anterior');
+    const btnSig = document.getElementById('btn-siguiente');
+
+    if (btnAnt) {
+        btnAnt.addEventListener('click', () => {
+            if (paginaActual > 1) {
+                paginaActual--;
+                renderizarTienda(categoriaActual);
+            }
+        });
     }
 
-    if (linkMisCompras) {
-        linkMisCompras.classList.remove("d-none");
-    }
-
-    document.getElementById('btn-anterior').addEventListener('click', () => {
-        if (paginaActual > 1) {
-            paginaActual--;
+    if (btnSig) {
+        btnSig.addEventListener('click', () => {
+            paginaActual++;
             renderizarTienda(categoriaActual);
-        }
-    });
-
-    document.getElementById('btn-siguiente').addEventListener('click', () => {
-        paginaActual++;
-        renderizarTienda(categoriaActual);
-    });
+        });
+    }
             
     cargarProductosDesdeAPI(1, "Todos");
     
     const btnCarrito = document.getElementById('btn-ver-carrito');
-    if (btnCarrito) {
-        btnCarrito.onclick = verCarrito;
-    }
+    if (btnCarrito) btnCarrito.onclick = verCarrito;
     
     actualizarContador();
 });
-
-let totalItemsEnBaseDeDatos = 0; 
 
 async function cargarProductosDesdeAPI(pagina = 1, categoria = "Todos") {
     try {
         const respuesta = await fetch(`${API_URL}/api/productos`);
         const respuestaJson = await respuesta.json();
-
-        console.log("Respuesta API productos:", respuestaJson);
 
         const productosAPI = Array.isArray(respuestaJson)
             ? respuestaJson
@@ -75,11 +68,9 @@ async function cargarProductosDesdeAPI(pagina = 1, categoria = "Todos") {
                 ...p,
                 imagen: nombreImagen.startsWith('http') 
                     ? nombreImagen 
-                    : `${API_URL}/assets/img/${nombreImagen}`
+                    : `../assets/img/${nombreImagen}`
             };
         });
-
-        totalItemsEnBaseDeDatos = respuestaJson.totalItems || respuestaJson.total || productosData.length;
 
         renderizarTienda(categoria);
 
@@ -98,8 +89,11 @@ async function cargarProductosDesdeAPI(pagina = 1, categoria = "Todos") {
 
 function actualizarBotones(totalProductos) {
     const totalPaginas = Math.ceil(totalProductos / productosPorPagina);
-    document.getElementById('btn-anterior').disabled = (paginaActual === 1);
-    document.getElementById('btn-siguiente').disabled = (paginaActual >= totalPaginas);
+    const btnAnt = document.getElementById('btn-anterior');
+    const btnSig = document.getElementById('btn-siguiente');
+    
+    if (btnAnt) btnAnt.disabled = (paginaActual === 1);
+    if (btnSig) btnSig.disabled = (paginaActual >= totalPaginas || totalPaginas === 0);
     
     const infoPag = document.getElementById('info-pagina');
     if (infoPag) {
@@ -107,17 +101,11 @@ function actualizarBotones(totalProductos) {
     }
 }
 
-window.irPagina = function (pagina, categoria) {
-    paginaActual = pagina;
-    renderizarTienda(categoria);
-};
-
 window.renderizarTienda = function (categoria = "Todos") {
     const contenedor = document.getElementById('lista-productos');
     if (!contenedor) return;
 
     if (productosData.length === 0) {
-        console.log("Memoria vacía por refresco, re-sincronizando con MySQL...");
         cargarProductosDesdeAPI(paginaActual, categoria);
         return; 
     }
@@ -150,13 +138,12 @@ window.renderizarTienda = function (categoria = "Todos") {
     contenedor.innerHTML = productosPagina.map(p => `
         <div class="col">
             <div class="card h-100 tarjeta-producto shadow-sm border-0 rounded-4 overflow-hidden">
-                <div class="position-relative text-center p-3" style="height: 180px; display: flex; align-items: center; justify-content: center; background:linear-gradient(180deg,#2b3a52,#243248);
-                    border-bottom:1px solid rgba(255,255,255,.08);">
+                <div class="position-relative text-center p-3" style="height: 180px; display: flex; align-items: center; justify-content: center; background:linear-gradient(180deg,#2b3a52,#243248); border-bottom:1px solid rgba(255,255,255,.08);">
                     <img src="${p.imagen}" 
                          alt="${p.nombre}" 
                          class="img-fluid rounded-3" 
                          style="max-height: 100%; object-fit: contain;"
-                         onerror="this.src='${API_URL}/assets/img/favicon.png'">
+                         onerror="this.src='../assets/img/favicon.png'">
                 </div>
                 <div class="card-body d-flex flex-column text-center pt-2">
                     <span class="badge bg-secondary-subtle text-secondary-emphasis align-self-center mb-2 px-3 rounded-pill small">${p.categoria}</span>
@@ -209,8 +196,7 @@ window.agregar = function (id) {
         timer: 1500,
         showConfirmButton: false,
         toast: true,
-        position: 'bottom-end',
-        scrollbarPadding: false 
+        position: 'bottom-end'
     });
 };
 

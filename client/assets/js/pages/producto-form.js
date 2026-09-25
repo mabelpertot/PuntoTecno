@@ -1,4 +1,4 @@
-const API_URL = "https://puntotecno.onrender.com"; // URL pública de tu backend en Render
+const API_URL = "https://puntotecno.onrender.com";
 
 if (localStorage.getItem("adminLogueado") !== "true") {
     window.location.href = "./login.html";
@@ -36,64 +36,64 @@ document.addEventListener("DOMContentLoaded", () => {
             });
     }
 
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+    if (form) {
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-        const formData = new FormData();
+            const formData = new FormData();
 
-        formData.append("nombre", document.getElementById("nombre").value.trim());
-        formData.append("precio", document.getElementById("precio").value);
-        formData.append("stock", document.getElementById("stock").value);
-        formData.append("categoria", document.getElementById("categoria").value);
-        formData.append("activo", document.getElementById("activo").checked ? 1 : 0);
+            formData.append("nombre", document.getElementById("nombre").value.trim());
+            formData.append("precio", document.getElementById("precio").value);
+            formData.append("stock", document.getElementById("stock").value);
+            formData.append("categoria", document.getElementById("categoria").value);
+            formData.append("activo", document.getElementById("activo").checked ? 1 : 0);
 
-        const archivoImagen = document.getElementById("imagen").files[0];
+            const archivoImagen = document.getElementById("imagen").files[0];
 
-        if (archivoImagen) {
-            formData.append("imagen", archivoImagen);
-        }
-
-        try {
-            let url = `${API_URL}/api/productos`;
-            let metodo = "POST"; 
-
-            if (productoId && productoId !== "null" && productoId !== "undefined") {
-                url = `${API_URL}/api/productos/${productoId}`;
-                metodo = "PUT"; 
+            if (archivoImagen) {
+                formData.append("imagen", archivoImagen);
             }
 
-            const respuesta = await fetch(url, {
-                method: metodo,
-                body: formData
-            });
+            try {
+                let url = `${API_URL}/api/productos`;
+                let metodo = "POST"; 
 
-            if (!respuesta.ok) {
-                const errorData = await respuesta.json();
-                console.error("Error backend completo:", JSON.stringify(errorData, null, 2));
-                throw new Error(
-                    errorData.errors?.map(e => e.msg).join(" | ") ||
-                    errorData.mensaje ||
-                    errorData.errors?.[0]?.msg ||
-                    "Error en la operación del servidor"
-                );
+                if (productoId && productoId !== "null" && productoId !== "undefined") {
+                    url = `${API_URL}/api/productos/${productoId}`;
+                    metodo = "PUT"; 
+                }
+
+                const respuesta = await fetch(url, {
+                    method: metodo,
+                    body: formData
+                });
+
+                if (!respuesta.ok) {
+                    const errorData = await respuesta.json();
+                    throw new Error(
+                        errorData.errors?.map(e => e.msg).join(" | ") ||
+                        errorData.mensaje ||
+                        "Error en la operación del servidor"
+                    );
+                }
+
+                await Swal.fire({
+                    icon: "success",
+                    title: productoId ? "Producto actualizado" : "Producto guardado con éxito",
+                    text: "Los cambios impactaron en la base de datos.",
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+
+                window.location.href = "./dashboard.html";
+
+            } catch (error) {
+                Swal.fire({
+                    icon: "error",
+                    title: "Error de guardado",
+                    text: error.message
+                });
             }
-
-            await Swal.fire({
-                icon: "success",
-                title: productoId ? "Producto actualizado" : "Producto guardado con éxito",
-                text: "Los cambios impactaron en la base de datos.",
-                timer: 1500,
-                showConfirmButton: false
-            });
-
-            window.location.href = "./dashboard.html";
-
-        } catch (error) {
-            Swal.fire({
-                icon: "error",
-                title: "Error de guardado",
-                text: error.message
-            });
-        }
-    });
+        });
+    }
 });
