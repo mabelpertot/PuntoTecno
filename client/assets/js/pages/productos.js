@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
             
-    cargarProductosDesdeAPI(1, "Todos");
+    cargarProductosDesdeAPI();
     
     const btnCarrito = document.getElementById('btn-ver-carrito');
     if (btnCarrito) btnCarrito.onclick = verCarrito;
@@ -53,35 +53,54 @@ document.addEventListener('DOMContentLoaded', () => {
     actualizarContador();
 });
 
-async function cargarProductosDesdeAPI(pagina = 1, categoria = "Todos") {
+async function cargarProductosDesdeAPI() {
+    const contenedor = document.getElementById('lista-productos');
+    if (contenedor) {
+        contenedor.innerHTML = `
+            <div class="col-12 text-center p-5">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2 text-muted">Cargando catálogo...</p>
+            </div>`;
+    }
+
     try {
         const respuesta = await fetch(`${API_URL}/api/productos`);
+        if (!respuesta.ok) throw new Error(`Estado ${respuesta.status}`);
+
         const respuestaJson = await respuesta.json();
 
-        const productosAPI = Array.isArray(respuestaJson)
-            ? respuestaJson
-            : (respuestaJson.data || respuestaJson.productos || respuestaJson.rows || []);
+        let arrayProductos = [];
+        if (Array.isArray(respuestaJson)) {
+            arrayProductos = respuestaJson;
+        } else if (Array.isArray(respuestaJson.data)) {
+            arrayProductos = respuestaJson.data;
+        } else if (Array.isArray(respuestaJson.productos)) {
+            arrayProductos = respuestaJson.productos;
+        } else if (Array.isArray(respuestaJson.rows)) {
+            arrayProductos = respuestaJson.rows;
+        }
 
-        productosData = productosAPI.map(p => {
-            const nombreImagen = p.imagen || p.Imagen || p.image || 'favicon.png';
+        productosData = arrayProductos.map(p => {
+            const img = p.imagen || p.Imagen || p.image || 'favicon.png';
             return {
-                ...p,
-                imagen: nombreImagen.startsWith('http') 
-                    ? nombreImagen 
-                    : `../assets/img/${nombreImagen}`
+                id: p.id,
+                nombre: p.nombre || "Producto sin nombre",
+                precio: p.precio || 0,
+                categoria: p.categoria || "General",
+                stock: p.stock !== undefined ? p.stock : 10,
+                activo: p.activo !== undefined ? p.activo : true,
+                imagen: img.startsWith('http') ? img : `../assets/img/${img}`
             };
         });
 
-        renderizarTienda(categoria);
+        renderizarTienda(categoriaActual);
 
     } catch (error) {
-        console.error('Error al conectar con la API de productos:', error);
-
-        const contenedor = document.getElementById('lista-productos');
+        console.error('Error al cargar productos:', error);
         if (contenedor) {
             contenedor.innerHTML = `
                 <div class="col-12 text-center p-5">
-                    <p class="alert alert-danger d-inline-block px-5">Error al cargar productos.</p>
+                    <p class="alert alert-danger d-inline-block px-5">Error al cargar productos. Por favor recargá la página.</p>
                 </div>`;
         }
     }
@@ -105,21 +124,14 @@ window.renderizarTienda = function (categoria = "Todos") {
     const contenedor = document.getElementById('lista-productos');
     if (!contenedor) return;
 
-    if (productosData.length === 0) {
-        cargarProductosDesdeAPI(paginaActual, categoria);
-        return; 
-    }
-
     if (categoria !== categoriaActual) {
         paginaActual = 1;
         categoriaActual = categoria;
     }
 
-    // Filtrado más flexible para mostrar todos los productos recibidos
     const productosAMostrar = productosData.filter(p => {
-        const estaActivo = p.activo === undefined || p.activo === null || p.activo === true || p.activo === 1 || p.activo === "1";
-        const coincideCategoria = categoria === "Todos" || p.categoria === categoria;
-
+        const estaActivo = (p.activo === true || p.activo === 1 || p.activo === "1" || p.activo === null || p.activo === undefined);
+        const coincideCategoria = (categoria === "Todos" || p.categoria.toLowerCase() === categoria.toLowerCase());
         return estaActivo && coincideCategoria;
     });
 
@@ -147,10 +159,10 @@ window.renderizarTienda = function (categoria = "Todos") {
                          onerror="this.src='../assets/img/favicon.png'">
                 </div>
                 <div class="card-body d-flex flex-column text-center pt-2">
-                    <span class="badge bg-secondary-subtle text-secondary-emphasis align-self-center mb-2 px-3 rounded-pill small">${p.categoria || 'General'}</span>
+                    <span class="badge bg-secondary-subtle text-secondary-emphasis align-self-center mb-2 px-3 rounded-pill small">${p.categoria}</span>
                     <h5 class="fw-bold mb-1 h6 titulo-producto text-truncate" title="${p.nombre}">${p.nombre}</h5>
-                    <p class="text-danger fw-bold h5 my-2">$${parseFloat(p.precio || 0).toLocaleString('es-AR')}</p>
-                    <p class="text-muted small mb-3">Stock: ${p.stock ?? 0} u.</p>
+                    <p class="text-danger fw-bold h5 my-2">$${parseFloat(p.precio).toLocaleString('es-AR')}</p>
+                    <p class="text-muted small mb-3">Stock: ${p.stock} u.</p>
                     <button class="btn btn-primary w-100 rounded-pill mt-auto fw-bold" onclick="agregar(${p.id})">
                         <i class="bi bi-plus-circle me-2"></i>Agregar
                     </button>
@@ -170,7 +182,7 @@ window.agregar = function (id) {
     const existe = carrito.find(p => p.id == id);
     const cantidadActual = existe ? Number(existe.cantidad) : 0;
 
-    if (cantidadActual >= stockDisponible) {
+    if (stockDisponible > 0 && cantidadActual >= stockDisponible) {
         Swal.fire({
             icon: 'warning',
             title: 'Stock insuficiente',
