@@ -1,7 +1,7 @@
 const API_URL = "https://puntotecno.onrender.com";
 
 document.addEventListener("DOMContentLoaded", () => {
-    const formLogin = document.getElementById("form-login");
+    const formLogin = document.getElementById("form-login") || document.getElementById("login-form");
     if (!formLogin) return;
 
     formLogin.addEventListener("submit", async (e) => {
