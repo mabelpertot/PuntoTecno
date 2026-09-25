@@ -6,53 +6,33 @@ const Venta = require('./venta');
 const Usuario = require('./usuario');
 
 const Venta_Productos = sequelize.define('Venta_Productos', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
     cantidad: {
         type: DataTypes.INTEGER,
         allowNull: false,
         defaultValue: 1
     },
-    precio: {
+    precioUnitario: {
         type: DataTypes.DECIMAL(10, 2),
-        allowNull: false
-    },
-    createdAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW
-    },
-    updatedAt: {
-        type: DataTypes.DATE,
-        allowNull: false,
-        defaultValue: DataTypes.NOW
+        allowNull: true
     }
-}, { 
+}, {
     tableName: 'venta_productos',
-    timestamps: true 
+    timestamps: false
 });
 
-// Relación Usuario <-> Venta
-Usuario.hasMany(Venta, { foreignKey: 'usuarioId', as: 'ventas' });
-Venta.belongsTo(Usuario, { foreignKey: 'usuarioId', as: 'usuario' });
-
-// Relación N:M Venta <-> Producto a través de Venta_Productos
-Venta.belongsToMany(Producto, { 
-    through: Venta_Productos, 
-    foreignKey: 'ventaId', 
-    otherKey: 'productoId',
-    as: 'Productos'
-});
-
-Producto.belongsToMany(Venta, { 
-    through: Venta_Productos, 
-    foreignKey: 'productoId', 
-    otherKey: 'ventaId',
-    as: 'ventas' 
-});
+// Relaciones
+Venta.belongsToMany(Producto, { through: Venta_Productos, foreignKey: 'ventaId' });
+Producto.belongsToMany(Venta, { through: Venta_Productos, foreignKey: 'productoId' });
 
 module.exports = {
     sequelize,
-    Usuario,
     Producto,
     Venta,
+    Usuario,
     Venta_Productos
 };
