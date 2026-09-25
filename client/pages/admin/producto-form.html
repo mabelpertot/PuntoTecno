@@ -77,21 +77,23 @@
                             </div>
 
                             <div class="mb-3">
-                                <label class="form-label fw-medium">Imagen del producto</label>
+                                <label class="form-label fw-bold">Imagen del producto</label>
                                 
-                                <!-- Opción A: Archivo local -->
+                                <!-- OPICIÓN 1: Pegar URL de internet o nombre de archivo (ej: teclado.jpg) -->
                                 <div class="mb-2">
-                                    <label for="imagen-file" class="form-label small text-muted">A) Subir archivo desde tu PC:</label>
-                                    <input type="file" id="imagen-file" class="form-control" accept="image/*">
-                                </div>
-
-                                <!-- Opción B: URL externa -->
-                                <div>
-                                    <label for="imagen-url" class="form-label small text-muted">B) O pegar enlace/URL directa de internet:</label>
+                                    <label for="imagen-url" class="form-label small text-muted">1. Pegar enlace/URL directa o nombre del archivo:</label>
                                     <div class="input-group">
                                         <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
-                                        <input type="url" id="imagen-url" class="form-control" placeholder="https://ejemplo.com/imagen.jpg">
+                                        <input type="text" id="imagen-url" class="form-control" placeholder="https://ejemplo.com/foto.jpg o teclado.jpg">
                                     </div>
+                                </div>
+
+                                <div class="text-center my-1 text-muted small">- O -</div>
+
+                                <!-- OPCIÓN 2: Subir un archivo desde la PC -->
+                                <div>
+                                    <label for="imagen-file" class="form-label small text-muted">2. Subir archivo desde tu computadora:</label>
+                                    <input type="file" id="imagen-file" class="form-control" accept="image/*">
                                 </div>
                             </div>
 
