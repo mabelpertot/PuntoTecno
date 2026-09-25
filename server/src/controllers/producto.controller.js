@@ -32,7 +32,13 @@ const productoController = {
         try {
             const { nombre, categoria, precio, stock, imagen, activo } = req.body;
 
-            const imagenFinal = req.file ? req.file.filename : imagen || 'default.jpg';
+            // Prioridad: 1. Archivo subido | 2. URL/Texto pegado | 3. Imagen por defecto
+            let imagenFinal = 'favicon.png';
+            if (req.file) {
+                imagenFinal = req.file.filename;
+            } else if (imagen && imagen.trim() !== '') {
+                imagenFinal = imagen.trim();
+            }
 
             if (!nombre || !precio) {
                 return res.status(400).json({ mensaje: "Nombre y precio son obligatorios." });
@@ -81,14 +87,19 @@ const productoController = {
                 return res.status(404).json({ error: 'Producto no encontrado'});
             }
 
-            const imagenFinal = req.file ? req.file.filename : producto.imagen;
+            // Prioridad: 1. Archivo subido | 2. URL/Texto enviado en body | 3. Conservar la imagen previa
+            let imagenFinal = producto.imagen;
+            if (req.file) {
+                imagenFinal = req.file.filename;
+            } else if (req.body.imagen && req.body.imagen.trim() !== '') {
+                imagenFinal = req.body.imagen.trim();
+            }
 
             await producto.update({
                 nombre: req.body.nombre !== undefined ? req.body.nombre : producto.nombre,
                 categoria: req.body.categoria !== undefined ? req.body.categoria : producto.categoria,
                 precio: req.body.precio !== undefined ? parseFloat(req.body.precio) : producto.precio,
                 stock: req.body.stock !== undefined ? parseInt(req.body.stock) : producto.stock,
-               //imagen: req.body.imagen !== undefined ? req.body.imagen : producto.imagen,
                 imagen: imagenFinal,
                 activo: req.body.activo !== undefined ? req.body.activo : producto.activo
             });
