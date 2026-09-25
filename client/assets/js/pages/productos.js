@@ -89,7 +89,7 @@ async function cargarProductosDesdeAPI() {
                 categoria: p.categoria || "General",
                 stock: p.stock !== undefined ? p.stock : 10,
                 activo: p.activo !== undefined ? p.activo : true,
-                imagen: img.startsWith('http') ? img : `../assets/img/${img}`
+                imagen: img.startsWith('http') ? img : `${API_URL}/assets/img/${img}`
             };
         });
 
