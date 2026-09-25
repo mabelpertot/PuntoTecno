@@ -115,11 +115,12 @@ window.renderizarTienda = function (categoria = "Todos") {
         categoriaActual = categoria;
     }
 
+    // Filtrado más flexible para mostrar todos los productos recibidos
     const productosAMostrar = productosData.filter(p => {
-        const estaActivo = p.activo === true || p.activo === 1 || p.activo === "1";
+        const estaActivo = p.activo === undefined || p.activo === null || p.activo === true || p.activo === 1 || p.activo === "1";
         const coincideCategoria = categoria === "Todos" || p.categoria === categoria;
 
-        return estaActivo && coincideCategoria && Number(p.stock) > 0;
+        return estaActivo && coincideCategoria;
     });
 
     const inicio = (paginaActual - 1) * productosPorPagina;
@@ -146,10 +147,10 @@ window.renderizarTienda = function (categoria = "Todos") {
                          onerror="this.src='../assets/img/favicon.png'">
                 </div>
                 <div class="card-body d-flex flex-column text-center pt-2">
-                    <span class="badge bg-secondary-subtle text-secondary-emphasis align-self-center mb-2 px-3 rounded-pill small">${p.categoria}</span>
+                    <span class="badge bg-secondary-subtle text-secondary-emphasis align-self-center mb-2 px-3 rounded-pill small">${p.categoria || 'General'}</span>
                     <h5 class="fw-bold mb-1 h6 titulo-producto text-truncate" title="${p.nombre}">${p.nombre}</h5>
-                    <p class="text-danger fw-bold h5 my-2">$${parseFloat(p.precio).toLocaleString('es-AR')}</p>
-                    <p class="text-muted small mb-3">Stock: ${p.stock} u.</p>
+                    <p class="text-danger fw-bold h5 my-2">$${parseFloat(p.precio || 0).toLocaleString('es-AR')}</p>
+                    <p class="text-muted small mb-3">Stock: ${p.stock ?? 0} u.</p>
                     <button class="btn btn-primary w-100 rounded-pill mt-auto fw-bold" onclick="agregar(${p.id})">
                         <i class="bi bi-plus-circle me-2"></i>Agregar
                     </button>
