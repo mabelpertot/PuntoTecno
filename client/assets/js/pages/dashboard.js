@@ -77,7 +77,7 @@ function renderizarProductos(filtro = "", categoria = "Todos", orden = "") {
         <tr>
             <td>${producto.id}</td>
             <td>
-                <img src="${producto.imagen && producto.imagen.startsWith('http') ? producto.imagen : '../../assets/img/' + (producto.imagen || 'favicon.png')}" 
+                <img src="${producto.imagen && producto.imagen.startsWith('http') ? producto.imagen : '../../assets/img/' + (producto.imagen || 'favicon.png')}"
                     alt="${producto.nombre}" 
                     width="60" 
                     class="rounded shadow-sm" 
