@@ -82,9 +82,13 @@ async function cargarProductosDesdeAPI() {
 
         productosData = arrayProductos.map(p => {
             let nombreImagen = p.imagen || p.Imagen || p.image || 'favicon.png';
+            if (!nombreImagen || nombreImagen === 'null' || nombreImagen === 'undefined' || String(nombreImagen).trim() === '') {
+                nombreImagen = 'favicon.png';
+            }
             let rutaImagenFinal = nombreImagen;
             if (!nombreImagen.startsWith('http')) {
-                const nombreLimpio = nombreImagen.replace(/^\/?(assets\/img\/|public\/|images\/)?/, '');
+                const nombreLimpio = nombreImagen.replace(/^(\.\.\/|\.\/)*\/?(assets\/img\/|public\/|images\/)?/, '');
+                
                 rutaImagenFinal = `${API_URL}/assets/img/${nombreLimpio}`;
             }
 
@@ -177,7 +181,7 @@ window.renderizarTienda = function (categoria = "Todos") {
                          alt="${p.nombre}" 
                          class="img-fluid rounded-3" 
                          style="max-height: 100%; object-fit: contain;"
-                         onerror="this.src='../assets/img/favicon.png'">
+                         onerror="this.src='https://placehold.co/150?text=Sin+Imagen'">
                 </div>
                 <div class="card-body d-flex flex-column text-center pt-2">
                     <span class="badge bg-secondary-subtle text-secondary-emphasis align-self-center mb-2 px-3 rounded-pill small">${p.categoria}</span>
