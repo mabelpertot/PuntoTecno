@@ -82,10 +82,6 @@ async function cargarProductosDesdeAPI() {
 
         productosData = arrayProductos.map(p => {
             let nombreImagen = p.imagen || p.Imagen || p.image || 'favicon.png';
-            if (!nombreImagen || nombreImagen === 'null' || nombreImagen === 'undefined' || String(nombreImagen).trim() === '') {
-                nombreImagen = 'favicon.png';
-            }
-
             let rutaImagenFinal = nombreImagen;
             if (!nombreImagen.startsWith('http')) {
                 const nombreLimpio = nombreImagen.replace(/^\/?(assets\/img\/|public\/|images\/)?/, '');
