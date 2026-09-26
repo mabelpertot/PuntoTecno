@@ -81,7 +81,17 @@ async function cargarProductosDesdeAPI() {
         }
 
         productosData = arrayProductos.map(p => {
-            const img = p.imagen || p.Imagen || p.image || 'favicon.png';
+            let nombreImagen = p.imagen || p.Imagen || p.image || 'favicon.png';
+            if (!nombreImagen || nombreImagen === 'null' || nombreImagen === 'undefined' || String(nombreImagen).trim() === '') {
+                nombreImagen = 'favicon.png';
+            }
+
+            let rutaImagenFinal = nombreImagen;
+            if (!nombreImagen.startsWith('http')) {
+                const nombreLimpio = nombreImagen.replace(/^\/?(assets\/img\/|public\/|images\/)?/, '');
+                rutaImagenFinal = `${API_URL}/assets/img/${nombreLimpio}`;
+            }
+
             return {
                 id: p.id,
                 nombre: p.nombre || "Producto sin nombre",
@@ -89,7 +99,7 @@ async function cargarProductosDesdeAPI() {
                 categoria: p.categoria || "General",
                 stock: p.stock !== undefined ? p.stock : 10,
                 activo: p.activo !== undefined ? p.activo : true,
-                imagen: img.startsWith('http') ? img : `${API_URL}/assets/img/${img}`
+                imagen: rutaImagenFinal
             };
         });
 
