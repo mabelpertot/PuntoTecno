@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-app.use('/assets/img', express.static(path.join(__dirname, 'public', 'images')));
+app.use('/assets/img', express.static(path.join(__dirname, '..', 'public', 'images')));
 
 const authRoutes = require('./routes/api/auth.routes');
 const productosRoutes = require('./routes/api/productos.routes'); 
