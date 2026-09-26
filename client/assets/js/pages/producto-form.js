@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 
                 // Si la imagen actual es una URL, poblar el campo URL
                 const urlInput = document.getElementById("imagen-url");
-                if (urlInput && producto.imagen && producto.imagen.startsWith("http")) {
+                if (urlInput && producto.imagen) {
                     urlInput.value = producto.imagen;
                 }
             })
@@ -97,7 +97,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         stock,
                         categoria,
                         activo,
-                        imagen: urlInput || "favicon.png"
+                        imagen: urlInput !== "" ? urlInput : "favicon.png"
                     };
 
                     respuesta = await fetch(url, {
