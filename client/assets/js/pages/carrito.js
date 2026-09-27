@@ -147,7 +147,7 @@ async function confirmarPedido() {
     const totalCalculado = carrito.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
 
     const datosVenta = {
-        usuarioId: Number(usuarioId),
+        usuario_id: Number(usuarioId),
         cliente,
         total: totalCalculado,
         productos: carrito.map(p => ({

@@ -22,14 +22,16 @@ const Venta_Productos = sequelize.define('Venta_Productos', {
     }
 }, {
     tableName: 'venta_productos',
-    timestamps: false
+    timestamps: false,
+    hasPrimary: false
 });
 
 // Relaciones
-Venta.belongsToMany(Producto, { through: Venta_Productos, foreignKey: 'ventaId' });
-Producto.belongsToMany(Venta, { through: Venta_Productos, foreignKey: 'productoId' });
-Usuario.hasMany(Venta, { foreignKey: 'usuario_id', as: 'ventas' });
-Venta.belongsTo(Usuario, { foreignKey: 'usuario_id', as: 'usuario' });
+Venta.belongsToMany(Producto, { through: Venta_Productos, foreignKey: 'ventaid', otherKey: 'productoid' });
+Producto.belongsToMany(Venta, { through: Venta_Productos, foreignKey: 'productoid', otherKey: 'ventaid' });
+
+Usuario.hasMany(Venta, { foreignKey: 'usuarioid', as: 'ventas' });
+Venta.belongsTo(Usuario, { foreignKey: 'usuarioid', as: 'usuario' });
 
 module.exports = {
     sequelize,
