@@ -2,7 +2,8 @@ const db = require('../models');
 
 const ventaController = {
     crearVenta: async (req, res) => {
-        const { usuario_id, total, productos } = req.body;
+        const usuario_id = req.body.usuario_id || req.body.usuarioId;
+        const { total, productos } = req.body;
         const t = await db.sequelize.transaction();
 
         try {
