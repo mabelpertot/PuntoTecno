@@ -28,13 +28,12 @@ const ventaController = {
                     transaction: t
                 });
 
-                await venta.addProducto(productoId, {
-                    through: {
-                        cantidad: cantidadComprada,
-                        precio: precioUnitario
-                    },
-                    transaction: t
-                });
+                await db.Venta_Productos.create({
+                    ventaid: venta.id,
+                    productoid: productoId,
+                    cantidad: cantidadComprada,
+                    precio: precioUnitario
+                }, { transaction: t });
             }
 
             await t.commit();
@@ -75,7 +74,6 @@ const ventaController = {
                     total: ventaJson.total,
                     createdAt: ventaJson.createdAt || ventaJson.fecha,
                     cliente: ventaJson.usuario ? ventaJson.usuario.nombre : (ventaJson.cliente || 'Consumidor Final'),
-                    //cliente: ventaJson.cliente || 'Consumidor Final',
                     productos: ventaJson.Productos ? ventaJson.Productos.map(p => {
                         const pivot = p.Venta_Productos || p.venta_productos || {};
                         return {
