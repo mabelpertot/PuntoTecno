@@ -6,12 +6,12 @@ const ventaController = {
         const { total, productos } = req.body;
         const t = await db.sequelize.transaction();
 
-        try {
+        try {// 1. Creamos la venta principal
             const venta = await db.Venta.create({
                 usuarioid: parseInt(usuario_id),
                 total: parseFloat(total)
             }, { transaction: t });
-
+            // 2. Procesamos cada producto individualmente con SQL plano para evitar errores de Sequelize
             for (let p of productos) {
                 const productoId = parseInt(p.id);
                 const cantidadComprada = parseInt(p.cantidad);
@@ -21,19 +21,20 @@ const ventaController = {
                 if (!productoDb || productoDb.stock < cantidadComprada) {
                     throw new Error(`Stock insuficiente para el producto ID: ${productoId}`);
                 }
-
+                // Descontar stock
                 await db.Producto.decrement('stock', {
                     by: cantidadComprada,
                     where: { id: productoId },
                     transaction: t
                 });
-
-                await db.Venta_Productos.create({
-                    ventaid: venta.id,
-                    productoid: productoId,
-                    cantidad: cantidadComprada,
-                    precio: precioUnitario
-                }, { transaction: t });
+                
+                await db.sequelize.query(
+                    `INSERT INTO venta_productos (ventaid, productoid, cantidad, precio, createdAt, updatedAt) VALUES (?, ?, ?, ?, NOW(), NOW())`,
+                    {
+                        replacements: [venta.id, productoId, cantidadComprada, precioUnitario],
+                        transaction: t
+                    }
+                );
             }
 
             await t.commit();
