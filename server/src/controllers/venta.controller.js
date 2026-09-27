@@ -8,7 +8,7 @@ const ventaController = {
 
         try {
             const venta = await db.Venta.create({
-                usuario_id: parseInt(usuario_id),
+                usuarioid: parseInt(usuario_id),
                 total: parseFloat(total)
             }, { transaction: t });
 
@@ -96,7 +96,7 @@ const ventaController = {
             const { id } = req.params;
 
             const ventas = await db.Venta.findAll({
-                where: { usuario_id: id },
+                where: { usuarioid: id },
                 include: [{
                     model: db.Producto,
                     as: 'Productos',
