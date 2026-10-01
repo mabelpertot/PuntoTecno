@@ -1,15 +1,27 @@
 const { Sequelize } = require('sequelize');
 
-const sequelize = new Sequelize(
-    process.env.MYSQL_DATABASE || 'punto_tecno_db',
-    process.env.MYSQL_USER || 'uaunumtix1ui0urw',
-    process.env.MYSQL_PASSWORD || 'pSvLuEEFqtmfdFWwDh5Q',
-    {
-        host: process.env.MYSQL_HOST || 'bnarc5ii8c8qdculzz3i-mysql.services.clever-cloud.com',
-        port: process.env.MYSQL_PORT || 3306,
+// Si existe DATABASE_URL (en Render), la usa. Si no, usa las credenciales explícitas de Clever Cloud.
+const sequelize = process.env.DATABASE_URL 
+    ? new Sequelize(process.env.DATABASE_URL, {
         dialect: 'mysql',
-        logging: false
-    }
-);
+        logging: false,
+        dialectOptions: {
+            ssl: {
+                require: true,
+                rejectUnauthorized: false
+            }
+        }
+      })
+    : new Sequelize(
+        'bnarc5ii8c8qdculzz3i', 
+        'uaunumtixlui0urw',    
+        'pSvLuEEFqtmfdFWwDh5Q',   
+        {
+            host: 'bnarc5ii8c8qdculzz3i-mysql.services.clever-cloud.com', // Host
+            port: 3306,
+            dialect: 'mysql',
+            logging: false
+        }
+      );
 
 module.exports = sequelize;
