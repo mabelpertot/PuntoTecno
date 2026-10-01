@@ -48,11 +48,8 @@ const ventaController = {
                     transaction: t
                 });
 
-                // CORREGIDO: Usamos los nombres exactos de la base de datos ('ventald' y 'productoid')[cite: 12]
                 await db.sequelize.query(
-                    `INSERT INTO venta_productos
-                    (ventald, productoid, cantidad, precio, createdAt, updatedAt)
-                    VALUES (?, ?, ?, ?, NOW(), NOW())`,
+                    `INSERT INTO venta_productos(ventaId, productoId, cantidad, precio, createdAt, updatedAt)VALUES (?, ?, ?, ?, NOW(), NOW())`,
                     {
                         replacements: [
                             venta.id,
