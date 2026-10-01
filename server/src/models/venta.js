@@ -10,11 +10,13 @@ const Venta = sequelize.define('Venta', {
 
     usuarioId: {
         type: DataTypes.INTEGER,
+        field: 'usuarioid', // 👈 Mapea exactamente con la columna de la base de datos
         allowNull: true
     },
 
     cliente: {
         type: DataTypes.STRING(255),
+        field: 'cliente',
         allowNull: true
     },
 
