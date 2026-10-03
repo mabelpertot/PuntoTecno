@@ -73,7 +73,6 @@ const authController = {
 
     login: async (req, res) => {
         try {
-            console.log('BODY RECIBIDO EN LOGIN:', req.body);
             const { email, password } = req.body;
 
             if (!email || !password) {

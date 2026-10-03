@@ -1,6 +1,5 @@
 const { Sequelize } = require('sequelize');
 
-// Si existe DATABASE_URL (en Render), la usa. Si no, usa las credenciales explícitas de Clever Cloud.
 const sequelize = process.env.DATABASE_URL 
     ? new Sequelize(process.env.DATABASE_URL, {
         dialect: 'mysql',
