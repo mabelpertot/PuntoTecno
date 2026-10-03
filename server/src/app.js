@@ -32,6 +32,19 @@ app.get("/debug-sentry", function mainHandler(req, res) {
 
 app.use(Sentry.Handlers.errorHandler());
 
+app.use(function onError(err, req, res, next) {
+    res.statusCode = 500;
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.end(`
+        <div style="font-family: Arial, sans-serif; text-align: center; margin-top: 50px;">
+            <h1 style="color: #ff4757;">¡Uy! Algo salió mal en Punto Tecno 🛒</h1>
+            <p>Nuestro equipo técnico ya fue notificado automáticamente.</p>
+            <p style="color: #666; font-size: 14px;">Código de referencia para soporte: <strong>${res.sentry}</strong></p>
+            <a href="/" style="color: #3498db; text-decoration: none;">Volver al inicio</a>
+        </div>
+    `);
+});
+
 const PORT = process.env.PORT || 3000;
 console.log('🔄 Sincronizando base de datos con MySQL...');
 
