@@ -65,7 +65,7 @@ function renderizarCompras(ventas) {
                     <ul class="mb-0 small">
                         ${v.Productos ? v.Productos.map(p => `
                             <li>
-                                <strong>${p.nombre}</strong> -${p.Venta_Productos ? p.Venta_Productos.cantidad : 1} unidad/es
+                                <strong>${p.nombre}</strong> Cant: ${p.Venta_Productos ? p.Venta_Productos.cantidad : 1} unidad/es
                             </li>
                         `).join("") : '<li>Sin detalle disponible</li>'}
                     </ul>
