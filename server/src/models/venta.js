@@ -10,7 +10,7 @@ const Venta = sequelize.define('Venta', {
 
     usuarioId: {
         type: DataTypes.INTEGER,
-        field: 'usuarioid', // 👈 Mapea exactamente con la columna de la base de datos
+        field: 'usuarioid', 
         allowNull: true
     },
 

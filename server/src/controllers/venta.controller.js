@@ -18,7 +18,7 @@ const ventaController = {
             for (let p of productos) {
                 const productoId = parseInt(p.id);
                 const cantidadComprada = parseInt(p.cantidad);
-                const precioUnitario = parseFloat(p.precio);
+                const precio = parseFloat(p.precio);
 
                 // Buscar producto
                 const productoDb = await db.Producto.findByPk(
@@ -55,7 +55,7 @@ const ventaController = {
                             venta.id,
                             productoId,
                             cantidadComprada,
-                            precioUnitario
+                            precio
                         ],
                         transaction: t
                     }

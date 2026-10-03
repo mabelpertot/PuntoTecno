@@ -16,7 +16,7 @@ const Venta_Productos = sequelize.define('Venta_Productos', {
         allowNull: false,
         defaultValue: 1
     },
-    precioUnitario: {
+    precio: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: true
     }
