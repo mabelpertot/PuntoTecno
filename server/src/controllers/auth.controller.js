@@ -20,7 +20,7 @@ const authController = {
                 nombre,
                 email,
                 password: passwordEncriptada,
-                rol: 'client' // Normalizado a 'client'
+                rol: 'client' 
             });
 
             return res.status(201).json({
@@ -73,6 +73,7 @@ const authController = {
 
     login: async (req, res) => {
         try {
+            console.log('BODY RECIBIDO EN LOGIN:', req.body);
             const { email, password } = req.body;
 
             if (!email || !password) {

@@ -15,9 +15,9 @@ const sequelize = process.env.DATABASE_URL
     : new Sequelize(
         'bnarc5ii8c8qdculzz3i', 
         'uaunumtixlui0urw',    
-        'pSvLuEEFqtmfdFWwDh5Q',   
+        process.env.DB_PASSWORD,   
         {
-            host: 'bnarc5ii8c8qdculzz3i-mysql.services.clever-cloud.com', // Host
+            host: 'bnarc5ii8c8qdculzz3i-mysql.services.clever-cloud.com', 
             port: 3306,
             dialect: 'mysql',
             logging: false
