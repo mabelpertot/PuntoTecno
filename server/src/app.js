@@ -1,7 +1,12 @@
+const Sentry = require("@sentry/node");
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
 const app = express();
+
+Sentry.init({ dsn: process.env.SENTRY_DSN });
+
+app.use(Sentry.Handlers.requestHandler());
 
 const { sequelize } = require('./models');
 
@@ -19,8 +24,13 @@ const ventasRoutes = require('./routes/api/ventas.routes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/productos', productosRoutes); 
-app.use('/api/ventas', ventasRoutes);       
+app.use('/api/ventas', ventasRoutes);  
 
+app.get("/debug-sentry", function mainHandler(req, res) {
+  throw new Error("My first Sentry error!");
+});
+
+app.use(Sentry.Handlers.errorHandler());
 
 const PORT = process.env.PORT || 3000;
 console.log('🔄 Sincronizando base de datos con MySQL...');
