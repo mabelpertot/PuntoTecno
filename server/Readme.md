@@ -15,7 +15,7 @@
 
 ## 🛠️ Credenciales de Prueba 
 ## Usuario Admin 
-* **Correo de prueba:** `admin@puntotecno.com`
+* **Correo de prueba:** `prueba@admin.com`
 * **Contraseña de prueba:** `123456`
 ## Usuario raso 
 * **Correo de prueba:** `jorgemolina@gmail.com`
