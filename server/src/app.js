@@ -40,7 +40,7 @@ app.use(function onError(err, req, res, next) {
             <h1 style="color: #ff4757;">¡Uy! Algo salió mal en Punto Tecno 🛒</h1>
             <p>Nuestro equipo técnico ya fue notificado automáticamente.</p>
             <p style="color: #666; font-size: 14px;">Código de referencia para soporte: <strong>${res.sentry}</strong></p>
-            <a href="/" style="color: #3498db; text-decoration: none;">Volver al inicio</a>
+            <a href="https://punto-tecno-omega.vercel.app/" style="color: #3498db; text-decoration: none;">Volver al inicio</a>
         </div>
     `);
 });
